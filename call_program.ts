@@ -8,11 +8,25 @@ import {
 } from "@solana/web3.js";
 import { AnchorProvider, Program, Wallet } from "@project-serum/anchor";
 import { IDL, IDL_TYPE } from "./counter_idl";
-
+import { config } from "dotenv";
+config();
 // Initialize connection and provider
 const connection = new Connection("https://api.devnet.solana.com", "confirmed");
 import wallett from "./wallet.json";
-const wallet = new Wallet(Keypair.fromSecretKey(new Uint8Array(wallett)));
+
+const secretKeyString = process.env.WALLET_SECRET_KEY;
+if (!secretKeyString) {
+  throw new Error("WALLET_SECRET_KEY environment variable is not set or empty");
+}
+
+let secretKeyArray: number[];
+secretKeyArray = JSON.parse(secretKeyString);
+
+
+const secretKeyUint8Array = new Uint8Array(secretKeyArray);
+const wallet = new Wallet(
+  Keypair.fromSecretKey(new Uint8Array(secretKeyUint8Array))
+);
 //const wallet = Keypair.fromSecretKey(new Uint8Array(wallett));
 const provider = new AnchorProvider(connection, wallet, {});
 
